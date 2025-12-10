@@ -19,7 +19,7 @@ const TimeTable: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  console.log('Current Events: ', events);
+
   const [newEvent, setNewEvent] = useState<
     Partial<Event> & { venueIndexes?: number[] }
   >({
