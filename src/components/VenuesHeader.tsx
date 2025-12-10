@@ -22,6 +22,7 @@ const VenuesHeader = ({ venues }: { venues: string[] }) => {
           padding='8px'
           textAlign='center'
           borderRight='1px solid #ccc'
+          color={'white'}
         >
           {venue}
         </Box>

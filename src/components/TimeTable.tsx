@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Tabs, Tab } from '@mui/material';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useEventStore, Event } from '../store/eventStore';
@@ -125,79 +123,77 @@ const TimeTable: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <DndProvider backend={HTML5Backend}>
-        <Box>
-          <Button
-            variant='contained'
-            onClick={() => setModalOpen(true)}
-            sx={{ m: 2 }}
-          >
-            Add Event
-          </Button>
+      <Box>
+        <Button
+          variant='contained'
+          onClick={() => setModalOpen(true)}
+          sx={{ m: 2 }}
+        >
+          Add Event
+        </Button>
 
-          <Tabs
-            value={selectedDay}
-            onChange={handleTabChange}
-            variant='scrollable'
-            scrollButtons='auto'
-          >
-            {days.map((day, i) => (
-              <Tab
-                key={i}
-                label={
-                  <Box textAlign='center'>
-                    <Box fontWeight='bold'>{format(day, 'EEEE')}</Box>
-                    <Box fontSize='12px'>{`Date: ${format(
-                      day,
-                      'yyyy-MM-dd'
-                    )}`}</Box>
-                  </Box>
-                }
-                sx={{
-                  paddingY: 1,
-                  paddingX: 2,
-                  width: '230px',
-                }}
-              />
-            ))}
-          </Tabs>
+        <Tabs
+          value={selectedDay}
+          onChange={handleTabChange}
+          variant='scrollable'
+          scrollButtons='auto'
+        >
+          {days.map((day, i) => (
+            <Tab
+              key={i}
+              label={
+                <Box textAlign='center'>
+                  <Box fontWeight='bold'>{format(day, 'EEEE')}</Box>
+                  <Box fontSize='12px'>{`Date: ${format(
+                    day,
+                    'yyyy-MM-dd'
+                  )}`}</Box>
+                </Box>
+              }
+              sx={{
+                paddingY: 1,
+                paddingX: 2,
+                width: '230px',
+              }}
+            />
+          ))}
+        </Tabs>
 
-          <Box display='flex' overflow='hidden' height='calc(100vh - 120px)'>
-            <TimeSlotsColumn timeSlots={timeSlots} />
+        <Box display='flex' overflow='hidden' height='calc(100vh - 120px)'>
+          <TimeSlotsColumn timeSlots={timeSlots} />
 
-            <Box flex={1} overflow='auto'>
-              <VenuesHeader venues={venues} />
+          <Box flex={1} overflow='auto'>
+            <VenuesHeader venues={venues} />
 
-              <Box
-                display='flex'
-                height={`${timeSlots.length * SLOT_HEIGHT}px`}
-                position='relative'
-              >
-                {venues.map((_, venueIndex) => (
-                  <VenueColumn
-                    key={venueIndex}
-                    dayIndex={selectedDay}
-                    venueIndex={venueIndex}
-                    slotHeight={SLOT_HEIGHT}
-                    onEventClick={handleEditEvent}
-                  />
-                ))}
-              </Box>
+            <Box
+              display='flex'
+              height={`${timeSlots.length * SLOT_HEIGHT}px`}
+              position='relative'
+            >
+              {venues.map((_, venueIndex) => (
+                <VenueColumn
+                  key={venueIndex}
+                  dayIndex={selectedDay}
+                  venueIndex={venueIndex}
+                  slotHeight={SLOT_HEIGHT}
+                  onEventClick={handleEditEvent}
+                />
+              ))}
             </Box>
           </Box>
-
-          <AddEventModal
-            open={modalOpen}
-            onClose={() => setModalOpen(false)}
-            newEvent={newEvent}
-            setNewEvent={setNewEvent}
-            days={days}
-            venues={venues}
-            handleAddEvent={handleAddEvent}
-            handleTimeChange={handleTimeChange}
-          />
         </Box>
-      </DndProvider>
+
+        <AddEventModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          newEvent={newEvent}
+          setNewEvent={setNewEvent}
+          days={days}
+          venues={venues}
+          handleAddEvent={handleAddEvent}
+          handleTimeChange={handleTimeChange}
+        />
+      </Box>
     </LocalizationProvider>
   );
 };
