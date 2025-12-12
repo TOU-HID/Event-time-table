@@ -71,7 +71,6 @@ const TimeTable: React.FC = () => {
       const selectedVenues = newEvent.venueIndexes || [];
       const originalVenueIndex = selectedEvent.venueIndex;
 
-      // 1. Update or Delete the original event based on whether its venue is still selected
       if (selectedVenues.includes(originalVenueIndex)) {
         updateEvent({
           ...newEvent,
@@ -82,7 +81,6 @@ const TimeTable: React.FC = () => {
         deleteEvent(selectedEvent.id);
       }
 
-      // 2. Create new events for any newly selected venues
       const newIndices = selectedVenues.filter((i) => i !== originalVenueIndex);
       newIndices.forEach((venueIndex) => {
         addEvent({
@@ -195,43 +193,37 @@ const TimeTable: React.FC = () => {
           </Tabs>
         </Box>
 
-        {/* Main Scroll Container */}
         <Box
           flex={1}
           overflow='auto'
           position='relative'
           sx={{
-            // Ideally we might want some padding or border
           }}
         >
-          {/* Header Row (Venue Names) */}
           <Box 
             display='flex' 
             minWidth='fit-content' 
             position='sticky' 
             top={0} 
             zIndex={10}
-            bgcolor='white' // Ensure background so content doesn't show through
+            bgcolor='white'
           >
-            {/* Corner Spacer (Sticky Top-Left) */}
             <Box
               width='80px'
               flexShrink={0}
               bgcolor='white'
               position='sticky'
-              left={0} // Sticks horizontally
-              zIndex={11} // Higher than parent/sibling to stay on top
+              left={0}
+              zIndex={11}
               borderRight='1px solid #ccc'
               borderBottom='1px solid #ccc'
               sx={{
                 backgroundImage: 'linear-gradient(to bottom right, #fff 50%, #f0f0f0 50%)'
               }}
             />
-             {/* Header Content */}
             <VenuesHeader venues={venues} />
           </Box>
 
-          {/* Body Row (TimeSlots + VenueColumns) */}
           <Box display='flex' minWidth='fit-content'>
             <TimeSlotsColumn timeSlots={timeSlots} />
 
