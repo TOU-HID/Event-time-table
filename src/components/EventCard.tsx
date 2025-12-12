@@ -13,7 +13,7 @@ const EventCard: React.FC<EventCardProps> = ({
   slotHeight,
   onClick,
 }) => {
-  const height = ((event.duration + 15) / SLOT_MINUTES) * slotHeight;
+  const height = (event.duration / SLOT_MINUTES) * slotHeight;
   const top = (event.startMinute / SLOT_MINUTES) * slotHeight;
 
   const startHours = Math.floor((TIME_START + event.startMinute) / 60);
@@ -50,6 +50,7 @@ const EventCard: React.FC<EventCardProps> = ({
           padding: '4px',
           textAlign: 'center',
           boxSizing: 'border-box',
+          overflow: 'hidden', // Ensure text doesn't spill out
         }}
       >
         <Typography>

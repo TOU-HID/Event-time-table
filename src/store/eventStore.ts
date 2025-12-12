@@ -22,7 +22,7 @@ interface EventStore {
 
 export const useEventStore = create<EventStore>((set) => ({
   events: [],
-  currentWeekStart: new Date(2025, 11, 10),
+  currentWeekStart: new Date(),
   venues: ['Venue1', 'Venue2', 'Venue3', 'Venue4', 'Venue5', 'Venue6'],
   addEvent: (event) => set((state) => ({ events: [...state.events, event] })),
   updateEvent: (event) =>

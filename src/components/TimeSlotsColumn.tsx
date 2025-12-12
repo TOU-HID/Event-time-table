@@ -6,13 +6,11 @@ const TimeSlotsColumn = ({ timeSlots }: { timeSlots: string[] }) => {
     <Box
       width='80px'
       flexShrink={0}
-      overflow='auto'
       position='sticky'
       left={0}
-      zIndex={2}
+      zIndex={3}
       bgcolor='white'
       borderRight='1px solid #ccc'
-      marginTop={'35px'}
     >
       {timeSlots.map((time, i) => (
         <Box
@@ -23,6 +21,7 @@ const TimeSlotsColumn = ({ timeSlots }: { timeSlots: string[] }) => {
           alignItems='center'
           justifyContent='center'
           fontSize='12px'
+          boxSizing='border-box'
         >
           {time}
         </Box>

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers';
 import { format } from 'date-fns';
+import { TIME_START } from '../constants';
 
 interface AddEventModalProps {
   open: boolean;
@@ -23,6 +24,7 @@ interface AddEventModalProps {
   venues: string[];
   handleAddEvent: () => void;
   handleTimeChange: (date: Date | null) => void;
+  onDelete?: () => void;
 }
 
 const AddEventModal: React.FC<AddEventModalProps> = ({
@@ -34,6 +36,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   venues,
   handleAddEvent,
   handleTimeChange,
+  onDelete,
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
@@ -94,7 +97,12 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         <FormControl fullWidth margin='normal'>
           <TimePicker
             label='Start Time'
-            value={new Date(0, 0, 0, 9, newEvent.startMinute || 0)}
+            value={(() => {
+              const totalMinutes = TIME_START + (newEvent.startMinute || 0);
+              const hours = Math.floor(totalMinutes / 60);
+              const minutes = totalMinutes % 60;
+              return new Date(0, 0, 0, hours, minutes);
+            })()}
             onChange={handleTimeChange}
             ampm={false}
             minutesStep={15}
@@ -124,6 +132,11 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
       </DialogContent>
 
       <DialogActions>
+        {onDelete && (
+          <Button onClick={onDelete} color='error'>
+            Delete
+          </Button>
+        )}
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleAddEvent} color='primary'>
           Save

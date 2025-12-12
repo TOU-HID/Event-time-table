@@ -13,7 +13,7 @@ import AddEventModal from './AddEventModal';
 import { SLOT_HEIGHT, TIME_START, TIME_END, SLOT_MINUTES } from '../constants';
 
 const TimeTable: React.FC = () => {
-  const { events, venues, currentWeekStart, addEvent, updateEvent, setEvents } =
+  const { events, venues, currentWeekStart, addEvent, updateEvent, deleteEvent, setEvents } =
     useEventStore();
 
   const [selectedDay, setSelectedDay] = useState(0);
@@ -63,18 +63,37 @@ const TimeTable: React.FC = () => {
       return `${hour}:${min.toString().padStart(2, '0')}`;
     }
   );
-
+  console.log('timeSlots:', timeSlots);
   const handleAddEvent = () => {
     if (!newEvent.title || !newEvent.venueIndexes?.length) return;
 
     if (selectedEvent) {
-      const eventToUpdate = {
-        ...newEvent,
-        id: selectedEvent.id,
-        venueIndex: selectedEvent.venueIndex,
-      } as Event;
+      const selectedVenues = newEvent.venueIndexes || [];
+      const originalVenueIndex = selectedEvent.venueIndex;
 
-      updateEvent(eventToUpdate);
+      // 1. Update or Delete the original event based on whether its venue is still selected
+      if (selectedVenues.includes(originalVenueIndex)) {
+        updateEvent({
+          ...newEvent,
+          id: selectedEvent.id,
+          venueIndex: originalVenueIndex,
+        } as Event);
+      } else {
+        deleteEvent(selectedEvent.id);
+      }
+
+      // 2. Create new events for any newly selected venues
+      const newIndices = selectedVenues.filter((i) => i !== originalVenueIndex);
+      newIndices.forEach((venueIndex) => {
+        addEvent({
+          id: `${Date.now()}-${venueIndex}`,
+          title: newEvent.title!,
+          dayIndex: newEvent.dayIndex!,
+          venueIndex,
+          startMinute: newEvent.startMinute!,
+          duration: newEvent.duration!,
+        } as Event);
+      });
     } else {
       const newEvents = newEvent.venueIndexes.map((venueIndex) => ({
         id: Date.now().toString() + '-' + venueIndex,
@@ -97,6 +116,21 @@ const TimeTable: React.FC = () => {
       startMinute: 0,
       duration: 15,
     });
+  };
+
+  const handleDeleteEvent = () => {
+    if (selectedEvent) {
+      deleteEvent(selectedEvent.id);
+      setModalOpen(false);
+      setSelectedEvent(null);
+      setNewEvent({
+        title: '',
+        dayIndex: 0,
+        venueIndexes: [],
+        startMinute: 0,
+        duration: 15,
+      });
+    }
   };
 
   const handleTimeChange = (date: Date | null) => {
@@ -123,53 +157,85 @@ const TimeTable: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box>
-        <Button
-          variant='contained'
-          onClick={() => setModalOpen(true)}
-          sx={{ m: 2 }}
-        >
-          Add Event
-        </Button>
+      <Box display='flex' flexDirection='column' height='100vh' overflow='hidden'>
+        <Box>
+          <Button
+            variant='contained'
+            onClick={() => setModalOpen(true)}
+            sx={{ m: 2 }}
+          >
+            Add Event
+          </Button>
 
-        <Tabs
-          value={selectedDay}
-          onChange={handleTabChange}
-          variant='scrollable'
-          scrollButtons='auto'
+          <Tabs
+            value={selectedDay}
+            onChange={handleTabChange}
+            variant='scrollable'
+            scrollButtons='auto'
+          >
+            {days.map((day, i) => (
+              <Tab
+                key={i}
+                label={
+                  <Box textAlign='center'>
+                    <Box fontWeight='bold'>{format(day, 'EEEE')}</Box>
+                    <Box fontSize='12px'>{`Date: ${format(
+                      day,
+                      'yyyy-MM-dd'
+                    )}`}</Box>
+                  </Box>
+                }
+                sx={{
+                  paddingY: 1,
+                  paddingX: 2,
+                  width: '230px',
+                }}
+              />
+            ))}
+          </Tabs>
+        </Box>
+
+        {/* Main Scroll Container */}
+        <Box
+          flex={1}
+          overflow='auto'
+          position='relative'
+          sx={{
+            // Ideally we might want some padding or border
+          }}
         >
-          {days.map((day, i) => (
-            <Tab
-              key={i}
-              label={
-                <Box textAlign='center'>
-                  <Box fontWeight='bold'>{format(day, 'EEEE')}</Box>
-                  <Box fontSize='12px'>{`Date: ${format(
-                    day,
-                    'yyyy-MM-dd'
-                  )}`}</Box>
-                </Box>
-              }
+          {/* Header Row (Venue Names) */}
+          <Box 
+            display='flex' 
+            minWidth='fit-content' 
+            position='sticky' 
+            top={0} 
+            zIndex={10}
+            bgcolor='white' // Ensure background so content doesn't show through
+          >
+            {/* Corner Spacer (Sticky Top-Left) */}
+            <Box
+              width='80px'
+              flexShrink={0}
+              bgcolor='white'
+              position='sticky'
+              left={0} // Sticks horizontally
+              zIndex={11} // Higher than parent/sibling to stay on top
+              borderRight='1px solid #ccc'
+              borderBottom='1px solid #ccc'
               sx={{
-                paddingY: 1,
-                paddingX: 2,
-                width: '230px',
+                backgroundImage: 'linear-gradient(to bottom right, #fff 50%, #f0f0f0 50%)'
               }}
             />
-          ))}
-        </Tabs>
-
-        <Box display='flex' overflow='hidden' height='calc(100vh - 120px)'>
-          <TimeSlotsColumn timeSlots={timeSlots} />
-
-          <Box flex={1} overflow='auto'>
+             {/* Header Content */}
             <VenuesHeader venues={venues} />
+          </Box>
 
-            <Box
-              display='flex'
-              height={`${timeSlots.length * SLOT_HEIGHT}px`}
-              position='relative'
-            >
+          {/* Body Row (TimeSlots + VenueColumns) */}
+          <Box display='flex' minWidth='fit-content'>
+            <TimeSlotsColumn timeSlots={timeSlots} />
+
+            <Box display='flex'>
               {venues.map((_, venueIndex) => (
                 <VenueColumn
                   key={venueIndex}
@@ -192,6 +258,7 @@ const TimeTable: React.FC = () => {
           venues={venues}
           handleAddEvent={handleAddEvent}
           handleTimeChange={handleTimeChange}
+          onDelete={selectedEvent ? handleDeleteEvent : undefined}
         />
       </Box>
     </LocalizationProvider>

@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import { useEventStore } from '../store/eventStore';
 import EventCard from './EventCard';
 import type { Event } from '../store/eventStore';
+import { VENUE_COLUMN_WIDTH } from '../constants';
 
 interface VenueColumnProps {
   dayIndex: number;
@@ -24,10 +25,11 @@ const VenueColumn: React.FC<VenueColumnProps> = ({
   return (
     <Box
       sx={{
-        width: '216px',
+        width: `${VENUE_COLUMN_WIDTH}px`,
         flexShrink: 0,
         borderRight: '1px solid #ccc',
         position: 'relative',
+        boxSizing: 'border-box',
       }}
     >
       {columnEvents.map((event) => (
